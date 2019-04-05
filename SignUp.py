@@ -2,7 +2,7 @@ from sys import path
 path.append('/usr/lib/python3/dist-packages/')
 from kivy.app import App
 from kivy.lang import Builder
-from Screen.Login import *
+from Login import *
 from kivy.uix.screenmanager import ScreenManager,Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
@@ -23,19 +23,19 @@ Builder.load_string('''
     pos_hint : {'top' : .9,'center_x' : 0.5}
     canvas:
         Color :
-            rgba : 1,.8353,.3098,1
+            rgba : hex('#4831D4')
         Rectangle:
             size : self.size
             pos : self.pos
     Label:
         text : "Sign Up"
-        color : 0,0,0,1
+        color : 1,1,1,1
         bold : True
         font_size : 35
 <SignUpBg>:
     canvas:
         Color:
-            rgba : 1,.8353,.3098,1
+            rgba : hex('#CCF381')
         Rectangle :
             size : self.size
             pos : self.pos
@@ -54,11 +54,11 @@ class RButton(BoxLayout):
         self.orientation = 'horizontal'
         self.spacing = 10
         self.padding = (10,10)
-        self.l = Label(text = 'Gender',size_hint = (1.5,1),font_size=18,color = (0,0,0,1))
+        self.l = Label(text = 'Gender',size_hint = (1.5,1),font_name="candara",font_size=25,color = (0,0,0,1))
         self.add_widget (self.l)
-        self.m = ToggleButton(text = 'Male',group = 'gender',font_size=18,size_hint=(1,.7),on_press = self.selectM,background_color=(.1254,.0392,.2117,1))
+        self.m = ToggleButton(text = 'Male',group = 'gender',font_size=18,size_hint=(1,.7),on_press = self.selectM,background_color=(.5,0,1,.6))
         self.add_widget(self.m)
-        self.f = ToggleButton(text = 'Female', group = 'gender',font_size=18,size_hint=(1,.7),on_press = self.selectF,background_color=(.1254,.0392,.2117,1))
+        self.f = ToggleButton(text = 'Female', group = 'gender',font_size=18,size_hint=(1,.7),on_press = self.selectF,background_color=(.5,0,1,.6))
         self.add_widget(self.f)
 
     def selectM(self,x):
@@ -75,10 +75,10 @@ class DOB(BoxLayout):
         self.orientation = 'horizontal'
         self.padding = (5,5)
         self.spacing = 10
-        self.l = Label(text= 'Date Of Birth',font_size=18, color = (0,0,0,1))
-        self.d = TextInput(hint_text = 'DD',size_hint = (.3,.4),write_tab = False,input_filter = 'int')
-        self.m = TextInput(hint_text = 'MM',size_hint = (.3,.4),write_tab = False,input_filter = 'int')
-        self.yy = TextInput(hint_text = 'YYYY',size_hint = (.5,.4),write_tab = False,input_filter = 'int')
+        self.l = Label(text= 'Date Of Birth',font_name="candara",font_size=25, color = (0,0,0,1))
+        self.d = TextInput(hint_text = 'DD',multiline=False,size_hint = (.3,.4),font_size=20,write_tab = False,input_filter = 'int')
+        self.m = TextInput(hint_text = 'MM',multiline=False,size_hint = (.3,.4),font_size=20,write_tab = False,input_filter = 'int')
+        self.yy = TextInput(hint_text = 'YYYY',multiline=False,size_hint = (.5,.4),font_size=20,write_tab = False,input_filter = 'int')
         self.add_widget(self.l)
         self.add_widget(self.d)
         self.add_widget(self.m)
@@ -100,12 +100,15 @@ class IL(BoxLayout):
     # Frame which group the label and input for various attributes
     def set(self,t,ps = False, input_f = None):
         self.t = t
-        self.add_widget(Label(text = t + ' : ', font_size=18,color = (0,0,0,1)))
-        self.ti = TextInput(hint_text = t ,password = ps,write_tab = False, input_filter = input_f )
+        self.add_widget(Label(text = t + ' : ',font_name="candara", font_size=25,color = (0,0,0,1)))
+        self.ti = TextInput(password = ps,font_size=30,multiline=False,write_tab = False, input_filter = input_f )
         self.add_widget(self.ti)
 
 class PopUp(Popup):
-    def set(self):
+    # Show pop up if encounter error in the login
+    def set(self,msg):
+        self.title = 'Hello Admin!'
+        self.content = Label(text = msg)
         self.size_hint = (None,None)
         self.size = (200,200)
 
@@ -134,7 +137,7 @@ class FirstList(BoxLayout):
     def check(self):
         if self.cpassword.ti.text != self.password.ti.text:
             self.PE = PopUp()
-            self.PE.set('Password Differ', 'Your Password do not match with confirm password')
+            self.PE.set('Password Differ Your\n Password do not match\n with confirm password')
             self.PE.open()
             return False
         return True
@@ -154,9 +157,9 @@ class SButton(BoxLayout):
         self.signupT = False
         self.orientation = 'horizontal'
         self.spacing = 10
-        self.b = Button(text = 'Sign Up',on_press = self.SignUpButton,font_size=18,size_hint=(1,.7),background_color=(.1254,.0392,.2117,1))
+        self.b = Button(text = 'Sign Up',on_press = self.SignUpButton,font_size=20,size_hint=(1,.7),background_color=(.5,0,1,.6))
         self.add_widget(self.b)
-        self.back = Button(text = 'Back', on_press = self.backtologin,font_size=18,size_hint=(1,.7),background_color=(.1254,.0392,.2117,1))
+        self.back = Button(text = 'Back', on_press = self.backtologin,font_size=20,size_hint=(1,.7),background_color=(.5,0,1,.6))
         self.add_widget(self.back)
 
     def SignUpButton(self,a):
