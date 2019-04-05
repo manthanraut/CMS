@@ -1,14 +1,15 @@
-from Screen import Login
-from Screen.SignUp import SignUpScreen
-from Screen.Section import SectionScreen
-from Screen.Resturant import ResScreen
-#from Screen.Lodging import LodScreen
+import Login
+from NewMenu import NewMenuScreen
+from Bill import BillScreen
+from Admin import AdminScreen
+from SignUp import SignUpScreen
+from Section import SectionScreen
+from Resturant import ResScreen
 from sys import path
 path.append('/usr/lib/python3/dist-packages/')
 from kivy.uix.screenmanager import ScreenManager
 from kivy.app import App
 from kivy.clock import Clock
-
 
 class SwitchScreen(ScreenManager):
     #Switch Screen is the main screen manager of the application
@@ -26,15 +27,34 @@ class SwitchScreen(ScreenManager):
         self.RS = ResScreen()
         self.RS.set()
         self.add_widget(self.RS)
-        #self.LS = LodScreen()
-        #self.LS.set()
-        #self.add_widget(self.LS)
+        self.AS = AdminScreen()
+        self.AS.set()
+        self.add_widget(self.AS)
+        self.BS=BillScreen()
+        self.BS.set()
+        self.add_widget(self.BS)
+        self.NM=NewMenuScreen()
+        self.NM.set()
+        self.add_widget(self.NM)
+        
     def update(self,dt):
-        # Checks if there is any change in the screen
+        #this method swicthes the screen depending on the result of click event on a button
         if self.SE.m.R.RSel == True and self.L.B.LMB.LM.LoginT == True :
             self.current = "CustResScreen"
+        elif self.AS.X.SL.next == True:
+            self.current='menu'
+        elif self.NM.X.ML.bk == True:
+            self.current='admin'
+        elif self.RS.rb.o.bk == True:
+            self.current = 'login'
+        elif self.RS.rb.o.bl == True:
+            self.current="Bill"
+        elif self.NM.X.ML.back==True:
+            self.current='admin'
+        elif self.L.B.LMB.LM.AdminT==True:
+            self.current='admin'
         elif self.L.B.LMB.LM.LoginT == True :
-            self.current = 'section'
+            self.current = 'CustResScreen'
         elif self.L.B.LMB.LM.SignUpT == True :
             self.current = 'signup'
             if self.SU.X.SL.su.backtl == True or self.SU.X.SL.su.signupT == True:
@@ -43,15 +63,12 @@ class SwitchScreen(ScreenManager):
                 self.SU.X.SL.su.backtl = False
                 self.SU.X.SL.su.signupT = False
 
-
 class HotelManagementSystemApp(App):
     # main application
     def build (self):
         self.a = SwitchScreen()
         self.a.loginC()
-        #Clock.schedule_interval(self.a.LS.update,1.0 / 10.0)
         Clock.schedule_interval(self.a.update, 1.0 / 60.0)
-        #Clock.schedule_interval(self.a.RS.rb.o.up,1.0 / 30.0)
         return self.a
 
 if __name__== '__main__':
