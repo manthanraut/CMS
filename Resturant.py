@@ -5,199 +5,199 @@ from kivy.uix.screenmanager import ScreenManager,Screen
 from kivy.modules import inspector
 from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.lang import Builder
 from kivy.uix.tabbedpanel import TabbedPanel,TabbedPanelItem
 from kivy.uix.scrollview import ScrollView
+from kivy.uix.textinput import TextInput
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.button import Button
+from kivy.uix.popup import Popup
 from kivy.clock import Clock
 import random
 import mysql.connector as db
 hmdb = db.connect(host="localhost",user="root",password="thechamp16",database="application")
-cursor = hmdb.cursor()
+cursor = hmdb.cursor(buffered=True)
 
 Builder.load_string('''
+#:import hex kivy.utils.get_color_from_hex
 <ResTitle>:
     orientation: 'vertical'
     size_hint : 1, .1
     canvas:
-        Color :
-            rgba : .9411,.3843,.5725,1
+        
         Rectangle:
             size : self.size
             pos : self.pos
+            source:'background1.jpg'
     Label:
         text : "Resturant"
         color : 0,0,0,1
         bold : True
+        italic: True
         font_size : 50
-        
-<ResMenu>:
-    canvas:
-        Color:
-            rgba : 0,1,0,1
-        Rectangle:
-            size : self.size
-            pos : self.pos
-                
 <Orders>:
     canvas:
         Color:
-            rgba : 0,1,1,1
+            rgba : hex('#FFF748')
         Rectangle:
             size : self.size
             pos : self.pos
+    
+<ResMenu>:
+    canvas:
+        
+        Rectangle:
+            size : self.size
+            pos : self.pos
+            source:'sixth.png'
+                
 <Item>:
     canvas:
         Color:
-            rgba : 0,1,.5,1
+            rgba : 1,.75,0,.96
         Rectangle:
             size : self.size
             pos : self.pos
             
-<Order>:
-    canvas:
-        Color:
-            rgba : 0,0,0,1
-        Rectangle:
-            size: self.size
-            pos : self.pos
+            
 ''')
 cartitem = []
 nud = False
-class Order(BoxLayout):
-    def set(self,item):
-        self.rm = False
-        self.orientation = 'horizontal'
-        self.size_hint = (1,None)
-        self.height = 44
-        self.name = Label(text = item[0],size_hint = (.4,1))
-        self.add_widget(self.name)
-        self.quantity = Label(text = str(item[2]),size_hint = (.3,1))
-        self.add_widget(self.quantity)
-        self.price = Label(text = str(int(item[2]) * int(item[1])),size_hint =(.2,1))
-        self.add_widget(self.price)
-        self.remove = Button(text = "X",size_hint = (.1,1),on_press = self.removeOrder)
-        self.add_widget(self.remove)
-        return self
-
-    def removeOrder(self,a):
-        self.rm =True
-
+g_orderid=random.randint(99,1000)
+class PopUp(Popup):
+    # Show pop up if encounter error in the login
+    def set(self,x):
+        self.title = 'Order status'
+        self.content = Label(text = 'OrderID :-{} Your \n Order successfully submitted'.format(g_orderid),font_size=16,font_name="candara")
+        self.size_hint = (None,None)
+        self.size = (250,200)
+class PopUp1(Popup):
+    def set(self,msg):
+        self.title='Dear Customer'
+        self.content = Label(text = msg,font_size=16,font_name="candara")
+        self.size_hint = (None,None)
+        self.size = (200,200)
+        
 class  Orders(BoxLayout):
     global cartitem
+    global itemname
     global nud
+    global g_order_id
     def set(self):
+        
         self.orientation = 'vertical'
-        self.size_hint = (.3,1)
+        self.size_hint = (.5,1)
         self.padding = (10,10)
         self.spacing = 10
-        self.cart = Label(text='Your Cart',color=(0,0,0,1),size_hint= (1,None),height=15)
+        self.cart = Label(text='View my order',font_name="candara",color=(0,0,0,1),size_hint= (1,.1),font_size=20,height=15)
         self.add_widget(self.cart)
-        self.bl = BoxLayout(orientation='horizontal',size_hint =(1,None),height=15)
-        self.i = Label(text='Items',color=(0,0,0,1),size_hint= (.4,1))
-        self.bl.add_widget(self.i)
-        self.q = Label(text='Quantity',color=(0,0,0,1),size_hint= (.3,1))
-        self.p = Label(text='Price',color=(0,0,0,1),size_hint= (.3,1))
-        self.bl.add_widget(self.q)
-        self.bl.add_widget(self.p)
-        self.add_widget(self.bl)
-        self.gl = GridLayout(cols=1, spacing=10, size_hint_y=None)
-        self.gl.bind(minimum_height = self.gl.setter('height'))
-        self.sv = ScrollView(size_hint=(1, 1), size=(self.width, self.height),do_scroll_x = False)
-        self.add_widget(self.sv)
-        self.tbl = BoxLayout(orientation = 'horizontal',size_hint = (1,None),height = 15)
-        self.total = 0
-        self.tbl.add_widget(Label(text='Total',size_hint=(.5,1),color = (0,0,0,1)))
-        self.totalprice = Label(text=str(self.total),size_hint=(.5,1),color = (0,0,0,1))
-        self.tbl.add_widget(self.totalprice)
-        self.add_widget(self.tbl)
-        self.sbl = BoxLayout(orientation = 'horizontal',size_hint = (1,None),height = 15)
-        self.sbl.add_widget(Button(text='Save',size_hint = (.5,1),on_press = self.back))
-        self.sbl.add_widget(Button(text = 'Pay Off',size_hint = (.5,1),on_press = self.back))
-        self.add_widget(self.sbl)
+        self.t_show=TextInput(readonly=True, pos_hint={'x':0,'y':.4},font_size=14, size_hint=[1, .6], background_color=[1,1,1,.8])
+        self.add_widget(self.t_show)
+        self.add_widget(Button(text = 'Show',size_hint = (1,.4),font_name="candara",background_color=(.4,0.8,0.5,.7),font_size=20,bold=True,on_press = self.show))
+        self.o_total = Label(text='Total :',color=(0,0,0,1),font_name="candara",pos_hint={'right':0.6,'y':.4},size_hint= (1,.2),font_size=20,height=15)
+        self.t_total=TextInput(readonly=True,hint_text="Total Amt.", font_size=18, size_hint=[.4, .43],pos_hint={'right':0.4,'y':.7}, background_color=[1,1,1,.8])
+        self.add_widget(self.o_total)
+        self.add_widget(self.t_total)
+        self.t_delete=TextInput(hint_text="Item name",font_size=20, size_hint=[.4, .25], background_color=[1,1,1,.8])
+        self.add_widget(self.t_delete)
+        self.add_widget(Button(text = 'Delete Item',font_name="candara",background_color=(.4,0.8,0.5,.7),font_size=20,bold=True,size_hint = (.5,.4),on_press = self.delete))
+        self.add_widget(Button(text="Submit",size_hint=(.5,.4),font_name="candara",background_color=(.4,0.8,0.5,.7),font_size=20,bold=True,on_press=self.toadmin))
+        self.add_widget(Button(text = 'View Bill',background_color=(.4,0.8,0.5,.7),font_name="candara",font_size=20,bold=True,size_hint = (1,.4),on_press = self.viewbill))
+        self.add_widget(Button(text = 'Sign out',background_color=(.4,0.8,0.5,.7),font_name="candara",font_size=20,bold=True,size_hint = (1,.4),on_press = self.back))
         self.shown = []
         self.obj = []
         self.bk = False
+        self.bl=False
         nud = False
+
+    def delete(self,a):
+        cursor.execute("delete from orderdata1 where item_name = '{}' and order_id = {}".format(self.t_delete.text,g_orderid))
+        cursor.execute("select item_name from orderdata1 where order_id = {}".format(g_orderid))
+        self.d=cursor.fetchall()
+        self.t_show.text=str(self.d)
+        hmdb.commit()
+        
+    def viewbill(self,a):
+        self.bl=True
+        
+    def show(self,a):
+        cursor.execute("select order_id,item_name,count(item_name) as qtn from orderdata1 group by order_id,item_name having order_id = {}".format(g_orderid))
+        self.s=cursor.fetchall()
+        self.t_show.text=str(self.s)
+        cursor.execute("select sum(m.price) FROM ordermenu as m INNER JOIN orderdata1 as i ON m.item_name=i.item_name where order_id = {}".format(g_orderid))
+        self.c=cursor.fetchall()
+        self.t=str(self.c)
+        total=[]
+        for i in self.t:
+            if(i=="'" or i==")" or i=="]" or i=='(' or i=='[' or i==','):
+                continue
+            total.append(i)
+        name1="".join(total)
+        if name1.find('Decimal') == -1:
+            pass
+        else:
+            self.n=name1.replace('Decimal',"")
+        self.t_total.text=self.n
+        hmdb.commit()
+        
     def back(self,a):
         self.bk = True
-        self.query = 'insert into reslog values (%s,%s)'%(self.total,random.randint(10,10000))
-        cursor.execute(self.query)
-        hmdb.commit()
+        
+    def aw(self,t):
+        w = IL()
+        w.set(t)
+        self.add_widget(w)
+        return w
 
-    def up(self,a):
-        global nud
-        global cartitem
-        self.similar = False
-        for i in self.obj:
-            if i.rm == True:
-                self.gl.remove_widget(i)
-                i.rm = False
-        if nud == True:
-            self.sv.remove_widget(self.gl)
-            for i in range(len(cartitem)):
-                for j in range(len(self.shown)):
-                    if self.shown[j][0] == cartitem[i][0]:
-                        self.similar = True
-                        self.objj = j
-                        self.obji = i
-
-                if self.similar == True:
-                    self.obj[self.obji].price.text = str(int(cartitem[self.obji][1]) * int(cartitem[self.obji][2]))
-                    self.obj[self.obji].quantity.text = str(cartitem[self.obji][2])
-                    self.similar = False
-                else:
-                    self.obj.append(Order())
-                    self.obj[i] = self.obj[i].set(cartitem[i])
-                    self.gl.add_widget(self.obj[i])
-                    self.a = cartitem[i]
-                    self.shown.append(self.a)
-            nud = False
-            self.total = 0
-            for i in range(len(self.shown)):
-                self.total += int(self.obj[i].price.text)
-            self.totalprice.text = str(self.total)
-            self.sv.add_widget(self.gl)
+    def toadmin(self,a):
+        self.p = PopUp1()
+        if len(str(self.t_total.text))==0:
+            self.p.set('Please make some Order \n to submit!!')
+            self.p.open()
         else:
-            pass
-
+            cursor.execute("insert into orderdetails(order_id,total) values ({},'{}')".format(g_orderid,self.n))
+            cursor.execute("insert into orderinfo select * from orderdata1")
+            self.x=random.randint(99,1000)
+            self.g_orderid = self.x
+            self.p = PopUp()
+            self.p.set(self.x)
+            self.p.open()
+            hmdb.commit()
+       
+class IL(BoxLayout):
+    # Frame which group the label and input for various attributes
+    def set(self,t):
+        self.t = t
+        self.add_widget(Label(text = t + ' : ',font_name="candara", font_size=18,color = (0,0,0,1),size_hint=(.3,.5)))
+        self.ti = TextInput(hint_text = t,write_tab = False, size_hint=(.45,.9))
+        self.add_widget(self.ti)
+        
 class Item(BoxLayout):
-    global cartitem
     global nud
+    global g_orderid
+    global g_user
+    
     def set(self,row):
         self.orientation = 'vertical'
         self.row = row
         self.size_hint = (.3,.2)
-        self.name = Label(text=row[0],size_hint=(1,0.5),color = (0,0,0,1))
+        self.name = Button(text=row[0],size_hint=(1,0.5),font_size=20,font_name="candara",color = (1,1,1,1),on_press=self.save)
         self.add_widget(self.name)
         self.bl = BoxLayout(orientation = 'horizontal', size_hint = (1,.5))
-        self.price = Label(text='Price :'+str(row[1]),size_hint = (.5,1),color = (0,0,0,1))
+        self.price = Label(text='Price :'+str(row[1]),font_name="candara",font_size=20,size_hint = (.5,1),color = (0,0,0,1))
         self.bl.add_widget(self.price)
-        self.addtocart = Button(text='Add to Card', size_hint = (.5,1),on_press= self.additem)
-        self.bl.add_widget(self.addtocart)
         self.add_widget(self.bl)
+        self.result=TextInput(readonly=True, font_size=18, size_hint=[1, .75], background_color=[1,1,1,.8])
+        self.add_widget(self.result)
         return self
-
-    def additem(self,a):
-        global nud
-        similar = False
-        nud = True
-        if cartitem==[]:
-            cartitem.append(list(self.row))
-        else:
-            for i in range(len(cartitem)):
-                if cartitem[i][0]==self.row[0]:
-                    cartitem[i][2] +=1
-                    similar = True
-                    break
-                else:
-                    similar = False
-            if similar == False:
-                cartitem.append(list(self.row))
-
+    
+    def save(self,textval):
+        self.result.text = textval.text
+        cursor.execute("insert into orderdata1 (order_id,item_name) values({},'{}')".format(g_orderid,self.result.text))
+        hmdb.commit()
 
 class Items(TabbedPanelItem):
     def set(self,text):
@@ -213,9 +213,7 @@ class Items(TabbedPanelItem):
             i += 1
             row = cursor.fetchone()
         self.add_widget(self.sl)
-
-
-
+        
 class ResMenu(TabbedPanel,BoxLayout):
     def set(self):
         self.orientaion = 'horizontal'
@@ -235,8 +233,7 @@ class ResMenu(TabbedPanel,BoxLayout):
         self.add_widget(self.extras)
 
 
-
-class ResBg(BoxLayout):
+class ResBg(BoxLayout,FloatLayout):
     def set(self):
         self.orientation = 'horizontal'
         self.size_hint = (1,.9)
@@ -247,6 +244,18 @@ class ResBg(BoxLayout):
         self.add_widget(self.o)
         self.add_widget(self.m)
 
+    def getdata(self):
+        global g_orderid
+        self.o.getdata()
+        self.item = self.o.Itemdetails
+        self.total = self.item 
+        self.o.su.back = True
+        self.x=random.randint(99,1000)
+        self.g_orderid = self.x
+        self.p = PopUp()
+        self.p.set(self.x)
+        self.p.open()
+        
 class ResTitle(BoxLayout):
         # Main title of the Application
     def set(self):
@@ -263,7 +272,7 @@ class ResScreen(Screen,BoxLayout):
         self.rb = ResBg()
         self.rb.set()
         self.add_widget(self.rb)
-
+        
 
 class ResScreenM(ScreenManager):
     def set(self):
@@ -275,7 +284,6 @@ class ResScreenApp(App):
     def build(self):
         self.s = ResScreenM()
         self.s.set()
-        Clock.schedule_interval(self.s.R.rb.o.up, 1.0 / 60.0)
         inspector.create_inspector(Window, self.s)
         return self.s
 
