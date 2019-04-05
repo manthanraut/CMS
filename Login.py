@@ -35,21 +35,21 @@ Builder.load_string('''
         font_size : 50
 <LoginBg>:
     Image:
-        source:'screen2.png'
+        source:'food.jpg'
         allow_stretch: True
         keep_ratio: False    
 <LoginMenu>:
     orientation : 'vertical'
     canvas:
         Color :
-            rgba :hex('#FFF804')
+            rgba :hex('#292826')
         Rectangle:
             size : self.size
             pos : self.pos
 <LoginMenuB>:
     canvas:
         Color:
-            rgba :hex('#F9FFF9')
+            rgba :hex('#F9D342')
         Rectangle :
             size : self.size
             pos : self.pos
@@ -62,15 +62,15 @@ Builder.load_string('''
         height : 36
         on_release : root.select('Customer')
         background_normal: ''
-        background_color : 1,.4392,.2627,1
+        background_color : 1,.75,0,.96
         color : 0,0,0,1
     Button:
-        text : 'Manager'
+        text : 'Admin'
         size_hint_y : None
         height : 36
-        on_release : root.select('Manager')
+        on_release : root.select('Admin')
         background_normal: ''
-        background_color : 1,.4392,.2627,1
+        background_color : 1,.75,0,.96
         color : 0,0,0,1
 ''')
 class UP(BoxLayout):
@@ -79,16 +79,16 @@ class UP(BoxLayout):
         self.padding = (5,5)
         self.spacing = 10
     def aset(self):
-        self.add_widget(Label(text = 'Account Type', color = (0,0,0,1)))
+        self.add_widget(Label(text = 'Account Type',font_name="candara", color = (1,1,1,1),font_size=25))
         self.Account = AccType()
-        self.acc = Button(text = 'Select Acc. Type',background_normal= '',background_color = (1,.4392,.2627,1),color = (0,0,0,1))
+        self.acc = Button(text = 'Select Acc. Type',font_name="candara",background_normal= '',background_color = (1,.75,0,.96),font_size=25,color = (0,0,0,1))
         self.acc.bind(on_release = self.Account.open)
         self.Account.bind(on_select = lambda instance, x : setattr( self.acc ,'text', x))
         self.add_widget(self.acc)
         self.set()
     def oset(self,t,f):
-        self.add_widget(Label(text = t + ' : ', color = (0,0,0,1)))
-        self.I = TextInput(hint_text = t, multiline = False, padding = (10,10),password = f)
+        self.add_widget(Label(text = t + ' : ', color = (1,1,1,1),font_name="candara",font_size=25))
+        self.I = TextInput(hint_text = t, multiline = False, padding = (10,10),background_color=(1,1,1,.9),font_size=25,password = f)
         self.add_widget(self.I)
         self.set()
 
@@ -129,13 +129,15 @@ class PopUp(Popup):
     # Show pop up if encounter error in the login
     def set(self):
         self.title = 'Wrong Login Details'
-        self.content = Label(text = 'You have entered \n wrong Login Details')
+        self.content = Label(text = 'You have entered \n wrong Login Details',font_name="candara")
         self.size_hint = (None,None)
         self.size = (200,200)
 
 class LoginMenu(BoxLayout):
     # Login Menu with all the input and button widgets
     def logincheck(self,instance):
+        global g_user
+        g_user=self.UN.I.text
         self.query = "SELECT * FROM logindetails WHERE username = '{}' AND acctype='{}' ".format(self.UN.I.text,self.AS.acc.text)
         cursor.execute(self.query)
         self.validcheck = cursor.fetchone()
@@ -147,21 +149,25 @@ class LoginMenu(BoxLayout):
             if self.PW.I.text == self.validcheck[1]:
                 self.LoginT = True
                 hmdb.close()
+                if self.PW.I.text=='admin123' and self.UN.I.text=='admin':
+                    self.AdminT=True
+                    hmdb.close()
             else :
                 self.p = PopUp()
                 self.p.set()
                 self.p.open()
-
+        
 
     def signupcheck(self,instance):
         self.SignUpT = True
 
     def set(self):
         self.LoginT = False
+        self.AdminT=False
         self.SignUpT = False
         self.padding = (10,10)
         self.pos_hint={'center_x' : 0.5,'center_y' : 0.5}
-        self.aw(Label(text='Login',font_size=18,color =(0,0,0,1), bold = True))
+        self.aw(Label(text='Login',font_name="candara",font_size=25,color =(1,1,1,1), bold = True))
         self.AS = UP()
         self.AS.aset()
         self.aw(self.AS)
@@ -171,12 +177,12 @@ class LoginMenu(BoxLayout):
         self.PW = UP()
         self.PW.oset('Password',True)
         self.aw(self.PW)
-        self.lg = Button(text = 'Login',font_size=20,background_normal= '',background_color = (1,.4392,.2627,1),color = (0,0,0,1))
+        self.lg = Button(text = 'Login',font_name="candara",font_size=25,background_normal= '',background_color = (1,.75,0,.96),color = (0,0,0,1))
         self.lg.bind(on_press = self.logincheck)
         self.aw(self.lg)
         self.signup = BoxLayout(orientation = 'horizontal', padding = (5,5),spacing = 10)
-        self.orl = Label(text = 'Or', font_size=22,size_hint = (.5,.2),color = (0,0,0,1))
-        self.signupb = Button(on_press = self.signupcheck,text = 'Sign Up', size_hint = (.7,1),font_size=20,background_normal= '',background_color = (1,.4392,.2627,1),color = (0,0,0,1))
+        self.orl = Label(text = 'Or', font_size=22,size_hint = (.5,.2),color = (1,1,1,1))
+        self.signupb = Button(on_press = self.signupcheck,text = 'Sign Up',font_name="candara", size_hint = (.7,1),font_size=25,background_normal= '',background_color = (1,.75,0,.96),color = (0,0,0,1))
         self.signup.add_widget(self.orl)
         self.signup.add_widget(self.signupb)
         self.aw(self.signup)
