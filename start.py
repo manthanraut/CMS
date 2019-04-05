@@ -3,7 +3,6 @@ from NewMenu import NewMenuScreen
 from Bill import BillScreen
 from Admin import AdminScreen
 from SignUp import SignUpScreen
-from Section import SectionScreen
 from Resturant import ResScreen
 from sys import path
 path.append('/usr/lib/python3/dist-packages/')
@@ -21,9 +20,6 @@ class SwitchScreen(ScreenManager):
         self.SU = SignUpScreen()
         self.SU.set()
         self.add_widget(self.SU)
-        self.SE = SectionScreen()
-        self.SE.set()
-        self.add_widget(self.SE)
         self.RS = ResScreen()
         self.RS.set()
         self.add_widget(self.RS)
@@ -39,7 +35,7 @@ class SwitchScreen(ScreenManager):
         
     def update(self,dt):
         #this method swicthes the screen depending on the result of click event on a button
-        if self.SE.m.R.RSel == True and self.L.B.LMB.LM.LoginT == True :
+        if self.L.B.LMB.LM.LoginT == True :
             self.current = "CustResScreen"
         elif self.AS.X.SL.next == True:
             self.current='menu'
