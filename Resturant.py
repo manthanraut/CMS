@@ -158,7 +158,9 @@ class  Orders(BoxLayout):
             self.p.set('Please make some Order \n to submit!!')
             self.p.open()
         else:
+            cursor.execute("CREATE TABLE IF NOT EXISTS orderdetails (order_id int,paid varchar(5),received varchar(5),total varchar(10))")
             cursor.execute("insert into orderdetails(order_id,total) values ({},'{}')".format(g_orderid,self.n))
+            cursor.execute("CREATE TABLE IF NOT EXISTS orderinfo (order_id int,item_name varchar(20))")
             cursor.execute("insert into orderinfo select * from orderdata1")
             self.x=random.randint(99,1000)
             self.g_orderid = self.x
@@ -196,6 +198,7 @@ class Item(BoxLayout):
     
     def save(self,textval):
         self.result.text = textval.text
+        cursor.execute("CREATE TABLE IF NOT EXISTS orderdata1 (order_id int.item_name varchar(20))")
         cursor.execute("insert into orderdata1 (order_id,item_name) values({},'{}')".format(g_orderid,self.result.text))
         hmdb.commit()
 
