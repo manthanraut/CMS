@@ -115,6 +115,7 @@ class MenuList(FloatLayout):
         self.sect=self.section.text
         self.item=self.itemname.text
         self.pr=self.price.text
+        cursor.execute("CREATE TABLE IF NOT EXISTS {} (name varchar(15),price int)".format(self.sect)
         cursor.execute("insert into {} values ('{}',{})".format(self.sect,self.item,self.pr))
         cursor.execute("insert into ordermenu values ('{}',{})".format(self.item,self.pr))
         self.p = PopUp()
