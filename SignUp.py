@@ -235,6 +235,7 @@ class SignUpScreen(Screen,BoxLayout):
         self.sl = self.X.SL.SecondListItem
         self.total = self.fl + self.sl
         self.X.SL.su.backtl = True
+        cursor.execute("CREATE TABLE IF NOT EXISTS customerdata(fullname varchar(30),rollno varchar(10),email varchar(40),mobileno bigint,username varchar(15),password varchar(20),branch varchar(20),city varchar(15),pincode bigint,aadhaarno bigint,gender varchar(5),dob varchar(15))")
         self.query = 'INSERT INTO customerdata VALUES ('
         for i in range(len(self.total)):
             self.query += "'"+self.total[i]+"'"
@@ -244,6 +245,7 @@ class SignUpScreen(Screen,BoxLayout):
                 self.query += ','
         self.query += ')'
         cursor.execute(self.query)
+        cursor.execute("CREATE TABLE IF NOT EXISTS logindetails (username varchar(20),password varchar(20),acctype varchar(15))")
         self.q = "insert into logindetails values ('{}','{}','Customer')".format(self.total[4],self.total[5])
         cursor.execute(self.q)
         hmdb.commit()
